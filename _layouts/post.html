@@ -1,0 +1,34 @@
+---
+layout: default
+---
+
+<article class="post">
+  <div class="post-header">
+    <p class="post-meta">
+      <a href="/blog/" class="post-back">← Insights</a>
+      <span class="post-dot">·</span>
+      <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time>
+      {% if page.author %}<span class="post-dot">·</span>{{ page.author }}{% endif %}
+      {% if page.tags.size > 0 %}
+        <span class="post-tags">
+          {% for tag in page.tags %}<span class="post-tag">{{ tag }}</span>{% endfor %}
+        </span>
+      {% endif %}
+    </p>
+    <h1>{{ page.title }}</h1>
+    {% if page.description %}<p class="post-standfirst">{{ page.description }}</p>{% endif %}
+  </div>
+
+  <div class="post-body">
+    {{ content }}
+  </div>
+
+  <div class="post-footer">
+    <p class="post-footer-kicker">Written by the team building EduSync</p>
+    <p>
+      WorldTree is building <a href="/edusync">EduSync</a>, a teacher dashboard that unifies student
+      data across platforms, engineered to NY Ed Law §2-d standards from the first line of code.
+    </p>
+    <a class="btn-primary" href="/edusync#waitlist">Join the pilot →</a>
+  </div>
+</article>

@@ -1,0 +1,29 @@
+title: WorldTree
+tagline: Safe AI Integration for School Success
+description: >-
+  WorldTree builds EduSync — a teacher dashboard that unifies student data
+  across Google Classroom, PowerSchool, and AP Classroom, engineered to
+  NY Ed Law §2-d standards from the first line of code.
+url: https://worldtreeai.org
+baseurl: ""
+
+permalink: /blog/:title/
+
+# Local-preview tooling — must never reach the published site
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor/
+  - README.md
+
+defaults:
+  - scope:
+      path: "_posts"
+      type: "posts"
+    values:
+      layout: "post"
+
+# GitHub Pages supports these two by default; no Gemfile needed.
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
