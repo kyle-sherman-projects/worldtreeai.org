@@ -1,0 +1,85 @@
+name: LinkedIn draft
+
+# Fires when a new post lands on main. Opens a GitHub issue containing a
+# copy-paste-ready LinkedIn draft, which reaches Sherman as an email.
+#
+# Deliberately NOT posting to LinkedIn directly: w_member_social tokens expire
+# every 60 days and refresh tokens are only issued to approved Marketing
+# Developer Platform partners, so a direct integration would fail silently
+# every two months.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '_posts/**'
+  workflow_dispatch:
+    inputs:
+      post:
+        description: 'Path to a post, e.g. _posts/2026-07-22-the-safety-gap.md'
+        required: true
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # need the previous commit to diff against
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install --quiet pyyaml
+
+      - name: Find newly added posts
+        id: find
+        run: |
+          if [ -n "${{ inputs.post }}" ]; then
+            files="${{ inputs.post }}"
+          else
+            # --diff-filter=A: added only, so editing an existing post does not
+            # re-trigger a draft for something already shared.
+            files=$(git diff --name-only --diff-filter=A \
+                      "${{ github.event.before }}" "${{ github.sha }}" \
+                      -- '_posts/*.md' '_posts/*.markdown' || true)
+          fi
+          echo "files<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$files" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          if [ -z "$files" ]; then
+            echo "No new posts in this push."
+          else
+            echo "New posts:"; echo "$files"
+          fi
+
+      - name: Build drafts and open issues
+        if: steps.find.outputs.files != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          echo "${{ steps.find.outputs.files }}" | tr -d '\r' | while read -r f; do
+            [ -z "$f" ] && continue
+            echo "Drafting for $f"
+            python scripts/linkedin_draft.py "$f" > /tmp/out.txt || continue
+            [ -s /tmp/out.txt ] || continue
+
+            title=$(grep -m1 '^::TITLE::' /tmp/out.txt | sed 's/^::TITLE:://')
+            sed -e '1{/^::TITLE::/d}' -e '/^::END::$/d' /tmp/out.txt > /tmp/body.md
+
+            gh issue create \
+              --repo "${{ github.repository }}" \
+              --title "LinkedIn draft: $title" \
+              --body-file /tmp/body.md \
+              --label "linkedin" 2>/dev/null \
+            || gh issue create \
+              --repo "${{ github.repository }}" \
+              --title "LinkedIn draft: $title" \
+              --body-file /tmp/body.md
+          done
