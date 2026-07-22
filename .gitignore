@@ -1,0 +1,20 @@
+# Jekyll build output
+_site/
+.jekyll-cache/
+.jekyll-metadata
+
+# Ruby (only if anyone runs Jekyll locally)
+Gemfile.lock
+vendor/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+
+# Never publish student data on the public site.
+# EduSync's data rules apply here too: this repo is PUBLIC.
+*.csv
+*.xlsx
+data/
+exports/
