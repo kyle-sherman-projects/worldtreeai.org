@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% if page.title %}{{ page.title }} | WorldTree{% else %}WorldTree | Safe AI Integration for School Success{% endif %}</title>
+  <title>{% if page.title %}{{ page.title }} | WorldTree{% else %}WorldTree | Safe Data for School Success{% endif %}</title>
   <meta name="description" content="{{ page.description | default: site.description | strip_newlines | truncate: 200 }}" />
   <link rel="canonical" href="{{ page.url | absolute_url }}" />
 
   <!-- Open Graph — controls how links look when shared to LinkedIn, where the content strategy lives -->
   <meta property="og:type" content="{% if page.layout == 'post' %}article{% else %}website{% endif %}" />
-  <meta property="og:title" content="{{ page.title | default: 'WorldTree — Safe AI Integration for School Success' }}" />
+  <meta property="og:title" content="{{ page.title | default: 'WorldTree — Safe Data for School Success' }}" />
   <meta property="og:description" content="{{ page.description | default: site.description | strip_newlines | truncate: 200 }}" />
   <meta property="og:url" content="{{ page.url | absolute_url }}" />
   <meta property="og:image" content="{{ '/assets/logo.png' | absolute_url }}" />
@@ -29,6 +29,8 @@
 {{ content }}
 
 {% include footer.html %}
+
+<script src="/assets/edusync-preview.js"></script>
 
 </body>
 </html>
