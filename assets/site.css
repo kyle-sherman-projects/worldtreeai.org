@@ -1278,6 +1278,20 @@
 
     .edusync .es-preview-note { font-size: 0.82rem; color: var(--text-muted); font-style: italic; margin-top: 0.9rem; }
 
+    .edusync .es-quote-lead { color: var(--text-muted); max-width: 680px; margin-top: 2rem; }
+    .edusync .es-pullquote {
+      margin: 1.2rem 0 0; padding: .1rem 0 .1rem 1.5rem;
+      border-left: 3px solid var(--gold); max-width: 700px;
+    }
+    .edusync .es-pullquote p {
+      font-family: 'Playfair Display', serif; font-size: 1.3rem;
+      line-height: 1.45; color: var(--navy);
+    }
+    .edusync .es-pullquote p em { font-style: italic; color: var(--navy); }
+    .edusync .es-pullquote .who {
+      margin-top: .8rem; font-size: .82rem; letter-spacing: .04em; color: var(--text-muted);
+    }
+
     .edusync .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.4rem; margin-top: 2rem; }
     .edusync .card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 1.6rem; }
     .edusync .card h3 { font-family: 'Playfair Display', serif; font-size: 1.15rem; margin-bottom: .6rem; }
