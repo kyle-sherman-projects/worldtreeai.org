@@ -280,9 +280,11 @@
     .esp-dots i:nth-child(1) { background: #e0685c; }
     .esp-dots i:nth-child(2) { background: #e6b84c; }
     .esp-dots i:nth-child(3) { background: #5aa568; }
-    .esp-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 0.9rem; color: var(--w-ink); }
+    /* Wordmark splits "Ler" + "ad" on the pronunciation (LAIR-ad), in the
+       WorldTree brand pair. --navy/--gold come from :root, not the --w-* set. */
+    .esp-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 0.9rem; color: var(--navy); }
     .esp--wide .esp-title { font-size: 1.1rem; }
-    .esp-title em { font-style: normal; color: var(--w-g); }
+    .esp-title em { font-style: normal; color: var(--gold); }
     .esp-badge {
       margin-left: auto; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
       font-weight: 600; color: #fff; background: var(--w-g); border-radius: 4px; padding: 0.15rem 0.45rem;
