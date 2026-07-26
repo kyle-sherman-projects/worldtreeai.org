@@ -133,7 +133,7 @@
 
   function shell(variant) {
     var bar = '<div class="esp-bar"><span class="esp-dots"><i></i><i></i><i></i></span>' +
-      '<span class="esp-title">Edu<em>Sync</em></span><span class="esp-badge">Live view</span></div>';
+      '<span class="esp-title">Le<em>rad</em></span><span class="esp-badge">Live view</span></div>';
     var greet = '<div class="esp-greet">Good morning, Ms. Rivera<span>Tuesday, June 30 · ' +
       HEALTHY + ' of ' + CONNECTORS.length + ' platforms in sync</span></div>';
     var statsRow = '<div class="esp-stats">' + statsHTML(variant) + '</div>';
