@@ -5,6 +5,10 @@
       --navy-mid: #1a2f4a;
       --gold: #c9a84c;
       --gold-light: #e8c97a;
+      /* Wordmark-only deep gold. --gold is 2.0:1 on light panels, too faint to
+         partner navy's 15.4:1 in a two-tone mark. Do not swap --gold itself —
+         it carries borders and accents sitewide. */
+      --gold-deep: #a8862b;
       --cream: #faf7f2;
       --warm-white: #fff9f0;
       --text: #1a1a2e;
@@ -284,7 +288,7 @@
        WorldTree brand pair. --navy/--gold come from :root, not the --w-* set. */
     .esp-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 0.9rem; color: var(--navy); }
     .esp--wide .esp-title { font-size: 1.1rem; }
-    .esp-title em { font-style: normal; color: var(--gold); }
+    .esp-title em { font-style: normal; color: var(--gold-deep); }
     .esp-badge {
       margin-left: auto; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
       font-weight: 600; color: #fff; background: var(--w-g); border-radius: 4px; padding: 0.15rem 0.45rem;
