@@ -66,7 +66,7 @@ for.
 ## What we're doing about it
 
 We drafted our NY Education Law §2-d pack (data inventory, data privacy agreement, Parents' Bill of
-Rights supplement, security plan) before [EduSync](/edusync) had a single user, and it is with
+Rights supplement, security plan) before [Lerad](/lerad) had a single user, and it is with
 education-privacy counsel now. It is a draft until they say otherwise, and I'll keep calling it a
 draft until then.
 

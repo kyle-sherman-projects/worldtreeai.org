@@ -1,10 +1,10 @@
 'use strict';
-/* Interactive EduSync product preview, shared by the homepage hero (compact)
-   and the EduSync page (wide, desktop layout). Synthetic fixture cast only,
-   mirroring edusync/samples — no real student data ever appears in marketing.
+/* Interactive Lerad product preview, shared by the homepage hero (compact)
+   and the Lerad page (wide, desktop layout). Synthetic fixture cast only,
+   mirroring lerad/samples — no real student data ever appears in marketing.
    Every count and chip is DERIVED from the submission rows below, the same way
    the real product must compute them, so the preview can't show a number it
-   can't back up. Mount by adding [data-edusync-preview] with data-variant. */
+   can't back up. Mount by adding [data-lerad-preview] with data-variant. */
 (function () {
   var TODAY = new Date(2026, 5, 30); // Tue Jun 30 2026, matching the demo clock
   var SRC = { gc: 'Classroom', ps: 'PowerSchool', ap: 'AP Classroom', kt: 'KITE' };
@@ -240,5 +240,5 @@
     if (root.hasAttribute('data-autoplay')) autoplay(root, seg, listEl);
   }
 
-  document.querySelectorAll('[data-edusync-preview]').forEach(mount);
+  document.querySelectorAll('[data-lerad-preview]').forEach(mount);
 })();
