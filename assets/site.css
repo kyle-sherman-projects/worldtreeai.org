@@ -5,10 +5,6 @@
       --navy-mid: #1a2f4a;
       --gold: #c9a84c;
       --gold-light: #e8c97a;
-      /* Wordmark-only deep gold. --gold is 2.0:1 on light panels, too faint to
-         partner navy's 15.4:1 in a two-tone mark. Do not swap --gold itself —
-         it carries borders and accents sitewide. */
-      --gold-deep: #a8862b;
       --cream: #faf7f2;
       --warm-white: #fff9f0;
       --text: #1a1a2e;
@@ -230,6 +226,7 @@
     .esp {
       --w-card: #ffffff; --w-ink: #2f2c27; --w-mut: #8a847a; --w-bd: #ded8cd;
       --w-g: #4f8a5b; --w-am: #c39a3a; --w-rd: #b3604a; --w-blue: #3d6ea5; --w-purple: #7c5cb0;
+      --lerad-ink: #101c46; /* navy sampled from the Lerad mark */
       position: relative;
       width: 100%;
       background: #f4f1ea;
@@ -284,11 +281,18 @@
     .esp-dots i:nth-child(1) { background: #e0685c; }
     .esp-dots i:nth-child(2) { background: #e6b84c; }
     .esp-dots i:nth-child(3) { background: #5aa568; }
-    /* Wordmark splits "Ler" + "ad" on the pronunciation (LAIR-ad), in the
-       WorldTree brand pair. --navy/--gold come from :root, not the --w-* set. */
-    .esp-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 0.9rem; color: var(--navy); }
+    /* Brand lockup: the Lerad spiral mark plus the wordmark set live, so it stays
+       crisp at any size. --lerad-ink is the mark's own navy (bluer than the site
+       --navy), so the two halves of the lockup read as one colour. */
+    .esp-brand { display: flex; align-items: center; gap: 0.4rem; min-width: 0; }
+    .esp--wide .esp-brand { gap: 0.5rem; }
+    .esp-logo { width: 1.15rem; height: 1.15rem; display: block; flex: none; }
+    .esp--wide .esp-logo { width: 1.5rem; height: 1.5rem; }
+    .esp-title {
+      font-weight: 700; font-size: 0.9rem; letter-spacing: -0.01em;
+      color: var(--lerad-ink); line-height: 1;
+    }
     .esp--wide .esp-title { font-size: 1.1rem; }
-    .esp-title em { font-style: normal; color: var(--gold-deep); }
     .esp-badge {
       margin-left: auto; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
       font-weight: 600; color: #fff; background: var(--w-g); border-radius: 4px; padding: 0.15rem 0.45rem;
