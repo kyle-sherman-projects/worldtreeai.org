@@ -226,7 +226,7 @@
     .esp {
       --w-card: #ffffff; --w-ink: #2f2c27; --w-mut: #8a847a; --w-bd: #ded8cd;
       --w-g: #4f8a5b; --w-am: #c39a3a; --w-rd: #b3604a; --w-blue: #3d6ea5; --w-purple: #7c5cb0;
-      --lerad-ink: #101c46; /* navy sampled from the Lerad mark */
+      --lerad-ink: #060c2e; /* the icon tile's own navy, sampled from it */
       position: relative;
       width: 100%;
       background: #f4f1ea;
@@ -281,10 +281,10 @@
     .esp-dots i:nth-child(1) { background: #e0685c; }
     .esp-dots i:nth-child(2) { background: #e6b84c; }
     .esp-dots i:nth-child(3) { background: #5aa568; }
-    /* Brand lockup: Flow's koru on its navy tile (the mascot minus the face)
-       plus the wordmark set live, so it stays crisp at any size. --lerad-ink is
-       the tile's own navy (bluer than the site --navy), so the two halves of the
-       lockup read as one colour. */
+    /* Brand lockup: the Lerad spiral on its navy tile -- the app icon itself,
+       square-cropped out of the dark logo -- plus the wordmark set live, so it
+       stays crisp at any size. --lerad-ink is the tile's own navy (bluer and
+       deeper than the site --navy), so the two halves read as one colour. */
     .esp-brand { display: flex; align-items: center; gap: 0.4rem; min-width: 0; }
     .esp--wide .esp-brand { gap: 0.5rem; }
     .esp-logo { width: 1.15rem; height: 1.15rem; display: block; flex: none; }
