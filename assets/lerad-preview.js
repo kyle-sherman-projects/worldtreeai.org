@@ -134,7 +134,7 @@
   function shell(variant) {
     var bar = '<div class="esp-bar"><span class="esp-dots"><i></i><i></i><i></i></span>' +
       '<span class="esp-brand">' +
-      '<img class="esp-logo" src="/assets/lerad-mark.png" width="96" height="96" alt="" />' +
+      '<img class="esp-logo" src="/assets/lerad-flow-mark.svg" width="96" height="96" alt="" />' +
       '<span class="esp-title">Lerad</span></span>' +
       '<span class="esp-badge">Live view</span></div>';
     var greet = '<div class="esp-greet">Good morning, Ms. Rivera<span>Tuesday, June 30 · ' +
