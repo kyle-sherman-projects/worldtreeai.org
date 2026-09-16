@@ -1,0 +1,71 @@
+name: Scheduled Pages rebuild
+
+# GitHub Pages builds this site in "legacy" mode: it rebuilds when something is
+# pushed to main, and at no other time. Jekyll excludes future-dated posts from
+# whatever build is running, so a post committed on July 27 and dated August 1 is
+# dropped from the July 27 build — and nothing ever triggers the build that would
+# pick it up. Left alone, a scheduled post silently never appears.
+#
+# This asks Pages to rebuild once a day. Any post whose date has since passed
+# gets published without needing a commit to carry it.
+#
+# Note: GitHub disables scheduled workflows in repos with no activity for 60 days.
+# A repo that goes that quiet has no pending posts either, but if you come back to
+# a dormant repo, check Actions before trusting a scheduled date.
+
+on:
+  schedule:
+    # 11:00 UTC = 07:00 America/New_York (EDT) / 06:00 (EST).
+    #
+    # _config.yml pins timezone: America/New_York, so a post dated 2026-08-01
+    # stops being "future" at 04:00 UTC. Running at 11:00 UTC clears that with
+    # room for the delays GitHub's scheduler is prone to under load, and lands
+    # the post on the morning of the date it claims.
+    - cron: '0 11 * * *'
+  workflow_dispatch:
+
+# Only what the build-request endpoint needs. No contents access: this workflow
+# never checks the repo out, it just tells Pages to rebuild what is already there.
+permissions:
+  pages: write
+
+concurrency:
+  group: pages-rebuild
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      # GitHub's REST docs for this endpoint only document the classic-PAT `repo`
+      # scope and say nothing about GITHUB_TOKEN, so `pages: write` above is the
+      # documented-permission reading, not a guarantee. If the dispatch test 403s,
+      # add a classic PAT with `repo` scope as PAGES_REBUILD_TOKEN and this picks
+      # it up with no edit. Nothing to change if GITHUB_TOKEN turns out to be fine.
+      - name: Request a Pages build
+        env:
+          GH_TOKEN: ${{ secrets.PAGES_REBUILD_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          gh api --method POST \
+            -H "Accept: application/vnd.github+json" \
+            "repos/${{ github.repository }}/pages/builds"
+
+      # gh api already exits nonzero on 4xx, which fails the job and emails on a
+      # scheduled run. This step turns "the request was accepted" into "the build
+      # actually finished", so an accepted-then-errored build isn't mistaken for
+      # a published post.
+      - name: Confirm the build succeeded
+        env:
+          GH_TOKEN: ${{ secrets.PAGES_REBUILD_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          for _ in $(seq 1 30); do
+            status=$(gh api "repos/${{ github.repository }}/pages/builds/latest" --jq .status)
+            echo "latest build status: $status"
+            case "$status" in
+              built)    exit 0 ;;
+              errored)  echo "::error::Pages build errored; site not updated." ; exit 1 ;;
+            esac
+            sleep 10
+          done
+          echo "::error::Pages build did not finish within 5 minutes."
+          exit 1

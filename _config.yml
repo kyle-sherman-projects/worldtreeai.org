@@ -9,6 +9,12 @@ baseurl: ""
 
 permalink: /blog/:title/
 
+# Post dates are bare (date: 2026-08-01) and Jekyll resolves them against the
+# build host's clock. GitHub's runners are UTC, which would make a post dated
+# August 1 go live at 8pm Eastern on July 31. Pinning this makes a scheduled
+# date mean midnight where the posts are actually written.
+timezone: America/New_York
+
 # Local-preview tooling — must never reach the published site
 exclude:
   - Gemfile
