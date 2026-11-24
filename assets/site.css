@@ -1255,6 +1255,18 @@
       font-style: italic;
     }
 
+    /* Product screenshots in posts: framed like the site's Lerad preview. */
+    .post-body .shot { margin: 2.75rem 0; }
+    .post-body .shot img {
+      display: block; width: 100%; height: auto;
+      border: 1px solid rgba(201,168,76,0.35); border-radius: 10px;
+      box-shadow: 0 12px 32px rgba(16,27,41,0.10), 0 2px 6px rgba(16,27,41,0.06);
+    }
+    .post-body .shot figcaption {
+      font-size: 0.82rem; color: var(--text-muted); line-height: 1.6;
+      margin-top: 0.9rem; font-style: italic;
+    }
+
     /* Table view — the WCAG-clean twin of every figure. Not optional
        chrome: it is what lets the sub-3:1 light dot ship at all. */
     .post-body .viz-table { margin-top: 0.8rem; }

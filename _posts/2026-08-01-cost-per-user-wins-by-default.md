@@ -9,6 +9,10 @@ description: >-
   decide on. Cost per user wins, because it is the only number that always exists.
 ---
 
+> **Update, November 24, 2026:** The September pilot this post mentions didn't start. Lerad is a
+> classroom prototype, built on synthetic data until the school authorizes real data in writing.
+> I'll post when a real pilot begins.
+
 Last month I wrote about [the gap between what states tell districts to check and what districts
 actually check](/blog/the-safety-gap/). This is the sequel, and it's stranger, because this time
 part of the gap sits inside a single survey.

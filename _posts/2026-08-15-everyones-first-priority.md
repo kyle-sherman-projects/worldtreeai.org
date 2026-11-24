@@ -9,6 +9,10 @@ description: >-
   the chain loses something at every handoff.
 ---
 
+> **Correction, November 24, 2026:** This post said our NY Education Law §2-d pack was with
+> education-privacy counsel. It wasn't: we haven't engaged counsel yet. The pack is a draft, and
+> it stays one until counsel reviews it.
+
 Over the last month I've written about four reports: [SETDA and CoSN](/blog/the-safety-gap/) on
 what states advise and districts require, then [Project Unicorn and Clever](/blog/cost-per-user-wins-by-default/)
 on what districts can measure and what teachers actually experience. Individually each is a

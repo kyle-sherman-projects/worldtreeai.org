@@ -8,6 +8,10 @@ description: >-
   opposite ends. The gap between them is where most student data actually lives.
 ---
 
+> **Correction, November 24, 2026:** This post said our NY Education Law §2-d pack was with
+> education-privacy counsel. It wasn't: we haven't engaged counsel yet. The pack is a draft, and
+> it stays one until counsel reviews it.
+
 Two reports landed in my inbox this year that, read separately, are unremarkable. Read side by
 side, they describe a problem nobody in K–12 edtech is being straight about.
 
