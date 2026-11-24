@@ -329,6 +329,11 @@
     .esp-conn .dot.ok { background: var(--w-g); }
     .esp-conn .dot.warn { background: var(--w-am); }
     .esp-conn .dot.bad { background: var(--w-rd); }
+    /* a platform Lerad doesn't connect to yet: shown, but plainly not live */
+    .esp-conn.soon { background: transparent; border-style: dashed; }
+    .esp-conn.soon .nm { color: var(--w-mut); }
+    .esp-conn .dot.soon { background: transparent; box-shadow: inset 0 0 0 1.5px var(--w-mut); }
+    .esp-um { font-size: 0.85em; color: var(--w-mut); border: 1px dashed var(--w-bd); border-radius: 4px; padding: 0 0.3rem; margin-left: 0.25rem; }
     .esp-note { margin-top: 0.6rem; font-size: 0.64rem; color: var(--w-mut); line-height: 1.55; }
 
     .esp-controls { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; }

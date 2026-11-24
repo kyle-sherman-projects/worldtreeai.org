@@ -6,50 +6,80 @@
    the real product must compute them, so the preview can't show a number it
    can't back up. Mount by adding [data-lerad-preview] with data-variant. */
 (function () {
-  var TODAY = new Date(2026, 5, 30); // Tue Jun 30 2026, matching the demo clock
-  var SRC = { gc: 'Classroom', ps: 'PowerSchool', ap: 'AP Classroom', kt: 'KITE' };
+  /* Updated 2026-11-24 to match the real dashboard (lerad/web.py) on the current
+     samples/ fixtures: MESA's 0-4 scale with LG titles, an A-D Culminating Task,
+     and lerad/dashboard.py's counting rules, so the numbers here are the ones
+     `lerad serve` shows for the same data (8 / 2 / 2 / 1). Only the connectors
+     that exist are shown as connected; Google Classroom and PLTW / KITE are
+     marked "coming soon", matching what the site now says. */
+  var TODAY = '2026-06-30'; // Tue Jun 30 2026, the fixtures' clock
+  var WINDOW_START = '2026-06-16'; // Overdue looks back 14 days
+  var SRC = { ps: 'PowerSchool', ap: 'AP Classroom' };
   var STATUS = {
-    graded: 'graded', turned_in: 'turned in · ungraded', in_progress: 'in progress',
-    not_started: 'not started', missing: 'missing', excused: 'excused'
+    missing: 'missing', none: 'no submission', not_started: 'not started', in_progress: 'in progress',
+    turned_in: 'turned in · to grade', graded: 'graded', excused: 'excused'
   };
+  var ORDER = { missing: 0, none: 1, not_started: 2, in_progress: 3, turned_in: 4, graded: 5, excused: 6 };
+  var LANES = ['Overdue', 'Today', 'Tomorrow', 'This week', 'Later', 'No date', 'Earlier'];
 
   var CONNECTORS = [
-    { name: 'Google Classroom', kind: 'live API',   status: 'ok',   detail: 'synced 12 min ago' },
-    { name: 'AP Classroom',     kind: 'CSV import',  status: 'ok',   detail: 'imported 6 h ago' },
-    { name: 'PowerSchool',      kind: 'CSV import',  status: 'warn', detail: '2 days old' },
-    { name: 'PLTW / KITE',      kind: 'CSV import',  status: 'bad',  detail: 'last import failed' }
+    { name: 'AP Classroom',     kind: 'CSV import', status: 'ok',   detail: '1h ago' },
+    { name: 'PowerSchool',      kind: 'CSV import', status: 'ok',   detail: '20h ago' },
+    { name: 'Google Classroom', kind: 'live API',   status: 'soon', detail: 'coming soon' },
+    { name: 'PLTW / KITE',      kind: 'CSV import', status: 'soon', detail: 'coming soon' }
   ];
+  var LIVE = CONNECTORS.filter(function (c) { return c.status !== 'soon'; });
+  var HEALTHY = LIVE.filter(function (c) { return c.status === 'ok'; }).length;
 
+  // subs: [name, status, score, late]. A name starting with '?' is a platform record
+  // not yet matched to a student (no email in the export): shown, never counted as Overdue.
   var A = [
-    { src: 'gc', course: 'Intro to Programming · P1', title: 'Paired Programming — Planning Doc', due: '2026-06-30', pts: 10,
-      subs: [['Aaliyah Torres','turned_in'],['Marcus Webb','turned_in'],['Jonah Kim','turned_in'],['Sofia Delgado','turned_in'],['Tyrell Jackson','turned_in'],['Dmitri Volkov','not_started'],['Janelle Osei','not_started']] },
-    { src: 'ps', course: 'Intro to Programming · P1', title: 'Ch. 5 Homework: Loops & Conditionals', due: '2026-06-30', pts: 20,
-      subs: [['Aaliyah Torres','graded',18],['Marcus Webb','graded',20],['Jonah Kim','graded',15],['Sofia Delgado','missing'],['Tyrell Jackson','graded',17],['Dmitri Volkov','graded',19],['Janelle Osei','turned_in']] },
+    { src: 'ps', course: 'Intro to Programming · P1', title: 'LG2: Ch. 5 Homework: Loops & Conditionals', due: '2026-06-30', pts: 4,
+      subs: [['Aaliyah Torres','graded','3'],['Marcus Webb','graded','4'],['Jonah Kim','graded','3',1],['Sofia Delgado','missing'],['Tyrell Jackson','graded','3'],['Dmitri Volkov','graded','4'],['Janelle Osei','not_started']] },
     { src: 'ap', course: 'AP CSP · P3', title: 'Free Response Set B', due: '2026-06-30', pts: 25,
-      subs: [['Aaliyah Torres','graded',21],['Marcus Webb','turned_in'],['Priya Raman','in_progress'],['Mei Lin Chen','graded',24],['Fatima Al-Rashid','not_started'],['Janelle Osei','graded',19]] },
-    { src: 'ps', course: 'AP CS A · P5', title: 'Unit 3 Quiz — Functions', due: '2026-06-26', pts: 30,
-      subs: [['Priya Raman','graded',28],['Mei Lin Chen','graded',30],['Fatima Al-Rashid','graded',25],['Aaliyah Torres','graded',27],['Tyrell Jackson','missing']] },
+      subs: [['Aaliyah Torres','graded','21'],['Marcus Webb','turned_in'],['Priya Raman','in_progress'],['Mei Lin Chen','graded','24'],['Fatima Al-Rashid','not_started'],['?Carlos Mendoza','in_progress'],['Janelle Osei','graded','19'],['Jonah Kim','not_started']] },
+    { src: 'ps', course: 'AP CS A · P5', title: 'LG2/LG3: Unit 3 Quiz — Functions', due: '2026-06-26', pts: 4,
+      subs: [['Priya Raman','graded','4'],['Mei Lin Chen','graded','4'],['Fatima Al-Rashid','graded','3'],['Aaliyah Torres','graded','3'],['Tyrell Jackson','missing']] },
+    { src: 'ap', course: 'AP CSP · P3', title: 'Unit 6 Progress Check: MCQ Part A', due: '2026-06-24', pts: 45,
+      subs: [['Aaliyah Torres','graded','38'],['Marcus Webb','graded','41'],['Priya Raman','graded','35'],['Mei Lin Chen','graded','44'],['Fatima Al-Rashid','graded','33'],['?Carlos Mendoza','graded','29'],['Janelle Osei','in_progress'],['Jonah Kim','graded','36']] },
+    { src: 'ps', course: 'AP CS A · P5', title: 'Recursion Practice Set', due: '2026-07-02', pts: 4,
+      subs: [['Priya Raman','not_started'],['Mei Lin Chen','graded','4'],['Fatima Al-Rashid','not_started'],['Aaliyah Torres','graded','3'],['Tyrell Jackson','not_started'],['An Nguyen','none']] },
     { src: 'ap', course: 'AP CSP · P3', title: 'Practice MCQ Bank', due: null, pts: 60,
-      subs: [['Aaliyah Torres','in_progress'],['Priya Raman','in_progress'],['Mei Lin Chen','graded',52],['Fatima Al-Rashid','not_started'],['Janelle Osei','in_progress']] },
-    { src: 'kt', course: 'Principles of Engineering · P2', title: 'POE Classroom Assessment 2', due: null, pts: 40, kite: true,
-      subs: [['Marcus Webb','graded',33],['Sofia Delgado','graded',28],['Tyrell Jackson','graded',31],['Janelle Osei','graded',36],['Ethan Brooks','graded',24],['Jonah Kim','missing']] }
+      subs: [['Aaliyah Torres','in_progress'],['Marcus Webb','not_started'],['Priya Raman','in_progress'],['Mei Lin Chen','graded','52'],['Fatima Al-Rashid','not_started'],['?Carlos Mendoza','not_started'],['Janelle Osei','in_progress'],['Jonah Kim','not_started']] },
+    { src: 'ps', course: 'Intro to Programming · P1', title: 'LG1: Ch. 4 Vocabulary Check', due: '2026-06-23', pts: 4,
+      subs: [['Aaliyah Torres','graded','4'],['Marcus Webb','graded','3'],['Jonah Kim','graded','3'],['Sofia Delgado','graded','2',1],['Tyrell Jackson','graded','4'],['Dmitri Volkov','excused','EX'],['Janelle Osei','graded','3']] },
+    { src: 'ps', course: 'Intro to Programming · P1', title: 'Culminating Task: Text Adventure Game', due: '2026-06-29', pts: null,
+      subs: [['Aaliyah Torres','graded','A'],['Marcus Webb','graded','B'],['Jonah Kim','graded','C',1],['Sofia Delgado','graded','D'],['Tyrell Jackson','graded','B'],['Dmitri Volkov','graded','A'],['Janelle Osei','graded','B']] }
   ];
 
-  // ── derivations (mirror the real product's rules) ──
-  function dd(a) { return a.due ? new Date(a.due + 'T12:00') : null; }
-  function sameDay(d1, d2) { return !!d1 && d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate(); }
-  function isPast(a) { var d = dd(a); return !!d && d < TODAY && !sameDay(d, TODAY); }
-  function outstanding(s) { return s[1] === 'missing' || s[1] === 'not_started' || s[1] === 'in_progress'; }
-  function isUngraded(s) { return s[1] === 'turned_in' || s[1] === 'in_progress'; }
-
-  var HEALTHY = CONNECTORS.filter(function (c) { return c.status !== 'bad'; }).length;
+  // ── derivations: lerad/dashboard.py's rules ──
+  function matched(s) { return s[0].charAt(0) !== '?'; }
+  function name(s) { return matched(s) ? s[0] : s[0].slice(1); }
+  function isOut(s) { return s[1] === 'missing' || s[1] === 'none' || s[1] === 'not_started' || s[1] === 'in_progress'; }
+  function view(a) {
+    var v = { a: a, turned: 0, ungraded: 0, started: 0, out: 0 };
+    a.subs.forEach(function (s) {
+      if (s[1] === 'turned_in' || s[1] === 'graded') v.turned++;
+      if (s[1] === 'turned_in') v.ungraded++;
+      if (s[1] === 'in_progress' || s[1] === 'turned_in' || s[1] === 'graded') v.started++;
+      if (matched(s) && isOut(s)) v.out++;
+    });
+    v.pastDue = !!a.due && a.due < TODAY;
+    v.overdue = v.pastDue && a.due >= WINDOW_START && v.out > 0;
+    return v;
+  }
+  // The real list's order: due date (undated last), then course, then title.
+  var V = A.map(view).sort(function (x, y) {
+    return (x.a.due === null) - (y.a.due === null) || (x.a.due || '').localeCompare(y.a.due || '') ||
+      x.a.course.localeCompare(y.a.course) || x.a.title.localeCompare(y.a.title);
+  });
 
   function stats() {
     return {
-      total: A.length,
-      dueToday: A.filter(function (a) { return sameDay(dd(a), TODAY); }).length,
-      overdue: A.filter(function (a) { return isPast(a) && a.subs.some(outstanding); }).length,
-      toGrade: A.reduce(function (n, a) { return n + a.subs.filter(isUngraded).length; }, 0)
+      total: V.length,
+      dueToday: V.filter(function (v) { return v.a.due === TODAY; }).length,
+      overdue: V.filter(function (v) { return v.overdue; }).length,
+      ungraded: V.filter(function (v) { return v.ungraded > 0; }).length
     };
   }
 
@@ -60,69 +90,76 @@
 
   function statsHTML(variant) {
     var s = stats();
-    var sync = HEALTHY + '/' + CONNECTORS.length;
+    var sync = HEALTHY + '/' + LIVE.length;
     if (variant === 'wide') {
-      return tile(s.total, 'Assignments') + tile(s.dueToday, 'Due today') + tile(s.overdue, 'Overdue', true) + tile(s.toGrade, 'Ungraded') + tile(sync, 'In sync');
+      return tile(s.total, 'Assignments') + tile(s.dueToday, 'Due today') + tile(s.overdue, 'Overdue', true) + tile(s.ungraded, 'Ungraded') + tile(sync, 'In sync');
     }
-    return tile(s.dueToday, 'Due today') + tile(s.overdue, 'Overdue', true) + tile(s.toGrade, 'To grade') + tile(sync, 'In sync');
+    return tile(s.dueToday, 'Due today') + tile(s.overdue, 'Overdue', true) + tile(s.ungraded, 'Ungraded') + tile(sync, 'In sync');
   }
 
   function railHTML() {
     var conns = CONNECTORS.map(function (c) {
-      return '<div class="esp-conn' + (c.status === 'bad' ? ' err' : '') + '">' +
+      return '<div class="esp-conn' + (c.status === 'bad' ? ' err' : c.status === 'soon' ? ' soon' : '') + '">' +
         '<div class="nm"><span class="dot ' + c.status + '"></span>' + c.name + '</div>' +
         '<div class="st">' + c.kind + ' · ' + c.detail + '</div></div>';
     }).join('');
-    return '<aside class="esp-rail"><h5>Connected platforms <b>' + HEALTHY + ' / ' + CONNECTORS.length + ' healthy</b></h5>' +
+    return '<aside class="esp-rail"><h5>Connected platforms <b>' + HEALTHY + ' / ' + LIVE.length + ' in sync</b></h5>' +
       '<div class="esp-conns">' + conns + '</div>' +
+      '<div class="esp-note">1 platform record waiting to be matched to a student. Lerad asks instead of guessing by name.</div>' +
       '<div class="esp-note">Least-privilege connectors, imports minimized and NY Ed Law §2-d-ready by design.</div></aside>';
   }
 
-  function chips(a) {
-    var c = [];
-    var miss = a.subs.filter(function (s) { return s[1] === 'missing'; }).length;
-    if (miss) c.push('<span class="esp-chip miss">' + miss + ' missing</span>');
-    var ung = a.subs.filter(isUngraded).length;
-    if (ung) c.push('<span class="esp-chip ung">' + ung + ' to grade</span>');
-    var gr = a.subs.filter(function (s) { return s[1] === 'graded'; }).length;
-    if (gr === a.subs.length) c.push('<span class="esp-chip done">all graded</span>');
-    else if (gr) c.push('<span class="esp-chip">' + gr + '/' + a.subs.length + ' graded</span>');
-    return c.join(' ');
+  function chips(v) {
+    var c;
+    if (v.overdue) c = '<span class="esp-chip miss">' + v.out + ' missing</span>';
+    else if (v.started === 0) c = '<span class="esp-chip">not started</span>';
+    else if (v.turned === 0) c = '<span class="esp-chip">in progress</span>';
+    else if (v.pastDue && !v.ungraded) c = '<span class="esp-chip done">graded</span>';
+    else c = '<span class="esp-chip">' + v.turned + ' turned in</span>';
+    if (v.ungraded) c += ' <span class="esp-chip ung">' + v.ungraded + ' to grade</span>';
+    return c;
   }
 
   function detail(a) {
-    var rows = a.subs.map(function (s) {
+    var rows = a.subs.slice().sort(function (x, y) {
+      return ORDER[x[1]] - ORDER[y[1]] || name(x).localeCompare(name(y));
+    }).map(function (s) {
       var v = STATUS[s[1]];
-      if (s[1] === 'graded') v = s[2] + ' / ' + a.pts;
-      else if (s[1] === 'missing' && a.kite) v = 'missing (roster-inferred)';
-      return '<tr><td>' + s[0] + '</td><td>' + v + '</td></tr>';
+      if (s[1] === 'graded') v = /^\d+(\.\d+)?$/.test(s[2]) && a.pts !== null ? s[2] + ' / ' + a.pts : s[2];
+      else if (s[1] === 'excused' && s[2]) v = 'excused (' + s[2] + ')';
+      if (s[3]) v += ' · late';
+      var who = name(s) + (matched(s) ? '' : ' <span class="esp-um">not matched</span>');
+      return '<tr><td>' + who + '</td><td>' + v + '</td></tr>';
     }).join('');
     return '<div class="esp-det"><table>' + rows + '</table></div>';
   }
 
-  function card(a) {
+  function card(v) {
+    var a = v.a;
     return '<div class="esp-a" tabindex="0">' +
       '<div class="r1"><span class="esp-src ' + a.src + '">' + SRC[a.src] + '</span><span class="t">' + a.title + '</span></div>' +
-      '<div class="r2">' + chips(a) + '</div>' + detail(a) + '</div>';
+      '<div class="r2">' + chips(v) + '</div>' + detail(a) + '</div>';
   }
 
-  function bucket(a) {
-    var d = dd(a);
-    if (!d) return ['No due date', 30];
-    if (isPast(a)) return a.subs.some(outstanding) ? ['Overdue', 0] : ['Earlier', 25];
-    if (sameDay(d, TODAY)) return ['Today', 10];
-    return ['Later', 20];
+  function lane(v) {
+    if (v.overdue) return 'Overdue';
+    if (!v.a.due) return 'No date';
+    var days = Math.round((new Date(v.a.due + 'T12:00') - new Date(TODAY + 'T12:00')) / 86400000);
+    if (days < 0) return 'Earlier';
+    if (days === 0) return 'Today';
+    if (days === 1) return 'Tomorrow';
+    return days <= 7 ? 'This week' : 'Later';
   }
 
   function groupsHTML(groupBy) {
     var m = new Map();
-    A.forEach(function (a) {
+    V.forEach(function (v) {
       var label, order;
-      if (groupBy === 'platform') { label = SRC[a.src]; order = 0; }
-      else if (groupBy === 'course') { label = a.course; order = 0; }
-      else { var b = bucket(a); label = b[0]; order = b[1]; }
+      if (groupBy === 'platform') { label = SRC[v.a.src]; order = 0; }
+      else if (groupBy === 'course') { label = v.a.course; order = 0; }
+      else { label = lane(v); order = LANES.indexOf(label); }
       if (!m.has(label)) m.set(label, { label: label, order: order, items: [] });
-      m.get(label).items.push(a);
+      m.get(label).items.push(v);
     });
     var groups = Array.from(m.values()).sort(function (x, y) { return x.order - y.order || x.label.localeCompare(y.label); });
     return groups.map(function (g) {
@@ -138,7 +175,7 @@
       '<span class="esp-title">Lerad</span></span>' +
       '<span class="esp-badge">Live view</span></div>';
     var greet = '<div class="esp-greet">Good morning, Ms. Rivera<span>Tuesday, June 30 · ' +
-      HEALTHY + ' of ' + CONNECTORS.length + ' platforms in sync</span></div>';
+      HEALTHY + ' of ' + LIVE.length + ' platforms in sync</span></div>';
     var statsRow = '<div class="esp-stats">' + statsHTML(variant) + '</div>';
     var controls = '<div class="esp-controls"><span>Group by</span><div class="esp-seg">' +
       '<button type="button" data-g="due" class="on">Due date</button>' +
